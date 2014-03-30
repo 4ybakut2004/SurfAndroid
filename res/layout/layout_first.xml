@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/main">
+    
+    <TextView
+        android:id="@+id/Tex1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22px"
+        android:paddingTop="20px"
+        android:gravity="center"
+        android:text="Добро пожаловать, Ringo!\nВыберете аудио файл и начните игру!"
+        android:textColor="#ffffff"
+    />
+    
+    <Button
+        android:id="@+id/But1"
+        android:background="@drawable/start"
+        android:layout_width="248px"
+        android:layout_height="52px"
+        android:layout_gravity="center"
+        android:layout_marginTop="30px"
+    />
+
+    <Button
+        android:id="@+id/But3"
+        android:layout_width="248px"
+        android:layout_height="52px" 
+        android:background="@drawable/track"
+        android:layout_gravity="center"
+    />
+    
+     <Button
+        android:layout_width="248px"
+        android:layout_height="52px" 
+        android:id="@+id/But2"
+        android:background="@drawable/record"
+        android:layout_gravity="center"
+    />
+
+     <Button
+         android:id="@+id/But4"
+         android:layout_width="248px"
+         android:layout_height="52px" 
+         android:background="@drawable/nick"
+         android:layout_gravity="center"
+     />
+
+</LinearLayout>
