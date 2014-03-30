@@ -4,7 +4,11 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.opengl.GLU;
 import android.opengl.GLSurfaceView.Renderer;
+import android.text.format.Time;
+
 import java.util.ArrayList;
+import java.util.Date;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -38,19 +42,19 @@ public class GLClass implements Renderer
    int tack = 0;
    boolean up;
    int width_w;
+   boolean firstCircle;
+   float delta = 0;
+   Date nowFirst = new Date();
+   Date nowSecond = new Date();
 
    public void Mus(boolean var1) 
    {
-      for(int var2 = 0; var2 < this.mp.size(); ++var2) 
-      {
-         if(this.mp.get(var2).isPlaying()) 
-         {
-            if(var1) 
-            {
+      for(int var2 = 0; var2 < this.mp.size(); ++var2){
+         if(this.mp.get(var2).isPlaying()){
+            if(var1){
                this.mp.get(var2).start();
             } 
-            else 
-            {
+            else{
                this.mp.get(var2).pause();
             }
          }
@@ -58,8 +62,7 @@ public class GLClass implements Renderer
 
    }
 
-   public GLClass(Context var1, ArrayList<MediaPlayer> var2) 
-   {
+   public GLClass(Context var1, ArrayList<MediaPlayer> var2){
       this.get_Context = var1;
       this.cube = new Cube(var1);
       this.cube_line = new Cube_line(this.cube.Camera, this.cube.Size_y);
@@ -71,8 +74,7 @@ public class GLClass implements Renderer
       this.sky = new skyBox();
    }
 
-   public void init(ArrayList<MediaPlayer> var1) 
-   {
+   public void init(ArrayList<MediaPlayer> var1){
       this.cube_line.init();
       this.bonus_star.init();
       this.lineCool = new line_cool();
@@ -96,13 +98,11 @@ public class GLClass implements Renderer
       this.ball = 0;
       this.enable = true;
       this.mp = var1;
-      
-      this.cube.musStart();
+      firstCircle = true;
+      delta = 1/43.0f;
    }
 
-   public void loadTexture(GL10 var1) 
-   {
-	   
+   public void loadTexture(GL10 var1){
 	  this.cube.loadGLTexture(var1, this.get_Context, R.drawable.fon, 0);
 	  this.cube.loadGLTexture(var1, this.get_Context, R.drawable.border, 1);
 	  
@@ -143,22 +143,25 @@ public class GLClass implements Renderer
       this.menu.back_menu.loadGLTexture(var1, this.get_Context, R.drawable.menu);
    }
 
-   public void onDrawFrame(GL10 var1) 
-   {
+   public void onDrawFrame(GL10 var1){
       var1.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
+      //Date nowFirst = new Date();
+      
+      if(firstCircle){
+    	  this.cube.musStart();
+    	  firstCircle = false;
+      }
       this.gl_copy = var1;
-      Vec3 var2 = this.cube.posCamera;
+      //Vec3 var2 = this.cube.posCamera;
       int var3 = (int)(10.0F * this.cube.posCamera.z);
       this.sky.draw(var1, this.dlx, this.dly);
       
-      for(int i = 0; i < this.fireMap.size(); i++)
-      {
+      for(int i = 0; i < this.fireMap.size(); i++){
     	  this.fireMap.get(i).draw(var1);
       }
       
-      if(var3 >= this.cube.Size_y - 10 && this.enable) 
-      {
+      if(var3 >= this.cube.Size_y - 5 && this.enable){
          this.enable = false;
          Mus(false);
          cube.musStop();
@@ -167,20 +170,15 @@ public class GLClass implements Renderer
          WorkFile var7 = new WorkFile();
          var7.readFile();
 
-         for(int var8 = 4; var8 >= 0; --var8) 
-         {
-            if(var7.nameCool.get(var8).cool < this.cube_line.ball) 
-            {
+         for(int var8 = 4; var8 >= 0; --var8){
+            if(var7.nameCool.get(var8).cool < this.cube_line.ball){
                --var6;
             }
          }
 
-         if(var6 < 5) 
-         {
-            for(int var9 = 4; var9 >= var6; --var9) 
-            {
-      		   if(var9 > 0)
-      		   {
+         if(var6 < 5){
+            for(int var9 = 4; var9 >= var6; --var9){
+      		   if(var9 > 0){
                		var7.nameCool.get(var9).name = var7.nameCool.get(var9 - 1).name;
                		var7.nameCool.get(var9).cool = var7.nameCool.get(var9 - 1).cool;
                }
@@ -191,31 +189,30 @@ public class GLClass implements Renderer
             var7.writeFile();
          }
       }
-
-      if(this.enable) 
-      {
+      
+      if(this.enable){
          this.dy = 0.0F;
          this.dx = 0.0F;
          this.dly = 0.0F;
          this.dlx = 0.0F;
-         var2.z += this.dz;
+         nowSecond = new Date();
+         delta = nowSecond.getTime() - nowFirst.getTime();
+         if(delta < 0) delta = 1.0f/38.0f;
+         nowFirst = new Date();
+         this.cube.posCamera.z += this.dz * 38 * delta/1000.0f;
          this.dy = Math.abs(this.cube.posCamera.z - (float)var3 / 10.0F) * (this.cube.Camera.get(var3 + 1).y - this.cube.Camera.get(var3).y);
          this.dy += this.cube.Camera.get(var3).y / 10.0F;
          this.dx = Math.abs(this.cube.posCamera.z - (float)var3 / 10.0F) * (this.cube.Camera.get(var3 + 1).x - this.cube.Camera.get(var3).x);
          this.dx += this.cube.Camera.get(var3).x / 10.0F - 0.3F;
          this.dly = (float)Math.atan((double)(this.cube.Camera.get(var3 + 1).y - this.cube.Camera.get(var3).y));
          this.dlx = (float)Math.atan((double)(this.cube.Camera.get(var3 + 1).x - this.cube.Camera.get(var3).x));
-         if(this.dx_turn != 0.0F) 
-         {
-            if(this.dx_turn < 0.0F && this.left) 
-            {
-               if(!this.rigth) 
-               {
+         if(this.dx_turn != 0.0F){
+            if(this.dx_turn < 0.0F && this.left){
+               if(!this.rigth){
                   this.rigth = true;
                }
 
-               if(10.0F * (this.cube.posCamera.x + this.dx + this.dx_turn) <= this.cube.Camera.get(var3).x - 7.0F) 
-               {
+               if(10.0F * (this.cube.posCamera.x + this.dx + this.dx_turn) <= this.cube.Camera.get(var3).x - 7.0F){
                   this.left = false;
                }
 
@@ -223,15 +220,12 @@ public class GLClass implements Renderer
                var5.x += this.dx_turn;
             }
 
-            if(this.dx_turn > 0.0F && this.rigth) 
-            {
-               if(!this.left) 
-               {
+            if(this.dx_turn > 0.0F && this.rigth){
+               if(!this.left){
                   this.left = true;
                }
 
-               if(10.0F * (this.cube.posCamera.x + this.dx + this.dx_turn) >= this.cube.Camera.get(var3).x - 2.0F) 
-               {
+               if(10.0F * (this.cube.posCamera.x + this.dx + this.dx_turn) >= this.cube.Camera.get(var3).x - 2.0F){
                   this.rigth = false;
                }
 
@@ -243,24 +237,21 @@ public class GLClass implements Renderer
          }
       }
 
-      if(this.up && this.enable) 
-      {
-         if((double)this.dy_up > 0.4D) 
-         {
+      if(this.up && this.enable){
+         if((double)this.dy_up > 0.4D){
             this.sign = -this.sign;
          }
 
          this.dy_up = (float)((double)this.dy_up + 0.007D * (double)this.sign);
-         if((double)this.dy_up < 0.007D) 
-         {
+         if((double)this.dy_up < 0.007D){
             this.up = false;
             this.sign = 1;
          }
-
+         
          this.repeatCode(var1, this.cube.posCamera.x + this.dx, this.cube.posCamera.y - this.dy - this.dy_up, this.cube.posCamera.z);
       } 
-      else 
-      {
+      else{
+    	 //nowFirst = new Date(); 
          this.repeatCode(var1, this.cube.posCamera.x + this.dx, this.cube.posCamera.y - this.dy + this.dy_b, this.cube.posCamera.z);
       }
      
@@ -273,19 +264,16 @@ public class GLClass implements Renderer
       var1.glScalef(0.02F, 0.02F, 0.1F);
       this.pauseButton.draw(var1);
       
-      if(!this.enable) 
-      {
+      if(!this.enable){
          this.menu.draw(var1);
          cube.musPause();
          Mus(false);
       }
-
    }
 
    public void onSurfaceChanged(GL10 var1, int var2, int var3) 
    {
-      if(var3 == 0) 
-      {
+      if(var3 == 0){
          var3 = 1;
       }
 
@@ -307,7 +295,6 @@ public class GLClass implements Renderer
 	   gl.glDepthFunc(GL10.GL_LEQUAL); 				//The Type Of Depth Testing To Do
 		
 	   loadTexture(gl);
-	   //Really Nice Perspective Calculations
 	   gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST); 
    }
 
@@ -343,20 +330,21 @@ public class GLClass implements Renderer
 	      
       int var5 = this.ball;
       this.ball = this.cube_line.draw(var1, var2, var3, var4, this.dlx, this.dly, this.get_Context);
-      if(this.ball < var5) 
-      {
+      if(this.ball < var5){
          this.lineCool.setVertex(-0.1F, true);
+         if(this.lineCool.coolFl){
+        	 this.lineCool.coolFl = false;
+        	 this.cube_line.ball = (int)(this.cube_line.ball * 1.2f);
+         }
          this.mp.get(0).start();
       }
 
-      if(this.ball > var5) 
-      {
+      if(this.ball > var5){
          this.lineCool.setVertex(0.1F, true);
          this.mp.get(0).start();
       }
       
-      switch(this.bonus_star.draw(var1, var2, var3, var4, this.dlx, this.dly)) 
-      {
+      switch(this.bonus_star.draw(var1, var2, var3, var4, this.dlx, this.dly)){
 	      case 1: // должно быть ускорение, но нет...
 	         this.mp.get(1).start();
 	         this.fireMap.add(new fire(var2, var3, var4, new float[] {0, 0, 1, 1})); 
@@ -374,26 +362,20 @@ public class GLClass implements Renderer
       
       int k = this.fireMap.size();
       int j = 0;
-      while(j < k)
-      {
-    	  if(this.fireMap.get(j).mapFire.get(0).color[3] <= 0.0f)
-    	  {
+      while(j < k){
+    	  if(this.fireMap.get(j).mapFire.get(0).color[3] <= 0.0f){
     		  this.fireMap.remove(j); 
     	  }
-    	  else
-    	  {
+    	  else{
     		  j++;
     	  }
     	  k = this.fireMap.size();
       }
-      if(this.dy_b < 0.0F) 
-      {
-         if(this.tack < 100) 
-         {
+      if(this.dy_b < 0.0F) {
+         if(this.tack < 100){
             ++this.tack;
          } 
-         else 
-         {
+         else{
             this.tack = 0;
             this.dy_b = 0.0F;
          }
