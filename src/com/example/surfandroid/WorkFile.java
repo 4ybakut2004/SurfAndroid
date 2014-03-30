@@ -169,21 +169,24 @@ public class WorkFile
 		   // длина отрисованной трассы
 		   int lenTer = (int)(lenData / bitRate) * 42;
 		   // количество пиков
-		   int countPic = (int)(lenTer / 100);
+		   int countPic = (int)(lenTer / 30);
 		   // интервал через сколько записывать 
 		   int lenInter = (int)(lenData / countPic);
 		   
 		   long sum = 0;
 		   int zel = 0;
-		   
+		   int writeCounter = 0;
+		   int c1 = 0;
+		   int period = 128;
+		   float[] fft = new float[period];
+		   int fftcount = 0;
 		   for(int i = 0; i < lenData; i += 4)
 		   {
 			   if(bits == 16)
 			   {
-				   int c1 = audioFileStream.read();
+				   c1 = audioFileStream.read();
 				   c1 = c1 << 8;
 				   c1 += audioFileStream.read();
-				   sum += c1;
 				   
 				   if(countChannels == 2)
 				   {
@@ -193,19 +196,50 @@ public class WorkFile
 			   }
 			   if(bits == 8)
 			   {
-				   sum += audioFileStream.read();
+				   c1 = audioFileStream.read();
 				   if(countChannels == 2)
 				   {
 					   audioFileStream.read();
 				   }
 			   }
 			   
-			   if(i / lenInter >= zel && i != 0)
+			   fft[fftcount++] = (float)c1 / 32000.0f;
+			   
+			   if(fftcount == period)
 			   {
-				   wav.add(sum / (float)lenInter);
+				   FFT getFFT = new FFT(period);
+				   float[] fftresult = new float[period];
+				   getFFT.fft(fft, fftresult);
+				   
+				   for(int j = 0; j < period; j++)
+				   {
+					   writeCounter += 4;
+					   if(writeCounter == lenInter)
+					   {
+						   wav.add(fftresult[j]);
+						   writeCounter = 0;
+					   }
+				   }
+				   
+				   fftcount = 0;
+			   }
+			   
+			   
+			   /*if(i % (period - 1) == 0 && i != 0)
+			   {
+				   FFT getFFT = new FFT(period);
+				   float[] fftresult = new float[period];
+				   getFFT.fft(fft, fftresult);
+				   wav.add((float)fftresult[period - 1]);
+				   fftcount = 0;
+			   }*/
+			   
+			   /*if(i / lenInter >= zel && i != 0)
+			   {
+				   wav.add((float)c1);
 				   sum = 0;
 				   zel ++;
-			   }
+			   }*/
 		   }
 		   audioFileStream.close();
 	   }
@@ -252,3 +286,82 @@ public class WorkFile
 	    }
    }
 }
+
+class FFT {
+
+	  int n, m;
+
+	  // Lookup tables. Only need to recompute when size of FFT changes.
+	  float[] cos;
+	  float[] sin;
+
+	  public FFT(int n) {
+	      this.n = n;
+	      this.m = (int) (Math.log(n) / Math.log(2));
+
+	      // Make sure n is a power of 2
+	      if (n != (1 << m))
+	          throw new RuntimeException("FFT length must be power of 2");
+
+	      // precompute tables
+	      cos = new float[n / 2];
+	      sin = new float[n / 2];
+
+	      for (int i = 0; i < n / 2; i++) {
+	          cos[i] = (float)Math.cos(-2 * Math.PI * i / n);
+	          sin[i] = (float)Math.sin(-2 * Math.PI * i / n);
+	      }
+
+	  }
+
+	  public void fft(float[] x, float[] y) {
+	      int i, j, k, n1, n2, a;
+	      float c, s, t1, t2;
+
+	      // Bit-reverse
+	      j = 0;
+	      n2 = n / 2;
+	      for (i = 1; i < n - 1; i++) {
+	          n1 = n2;
+	          while (j >= n1) {
+	              j = j - n1;
+	              n1 = n1 / 2;
+	          }
+	          j = j + n1;
+
+	          if (i < j) {
+	              t1 = x[i];
+	              x[i] = x[j];
+	              x[j] = t1;
+	              t1 = y[i];
+	              y[i] = y[j];
+	              y[j] = t1;
+	          }
+	      }
+
+	      // FFT
+	      n1 = 0;
+	      n2 = 1;
+
+	      for (i = 0; i < m; i++) {
+	          n1 = n2;
+	          n2 = n2 + n2;
+	          a = 0;
+
+	          for (j = 0; j < n1; j++) {
+	              c = cos[a];
+	              s = sin[a];
+	              a += 1 << (m - i - 1);
+
+	              for (k = j; k < n; k = k + n2) {
+	                  t1 = c * x[k + n1] - s * y[k + n1];
+	                  t2 = s * x[k + n1] + c * y[k + n1];
+	                  x[k + n1] = x[k] - t1;
+	                  y[k + n1] = y[k] - t2;
+	                  x[k] = x[k] + t1;
+	                  y[k] = y[k] + t2;
+	              }
+	          }
+	      }
+	  }
+	}

@@ -84,8 +84,10 @@ public class NewRender extends GLSurfaceView implements SensorEventListener
     	&& var1 < (float)(100 + this.width / 2) && var2 > (float)(this.height / 3) && var2 < var3 - var3 / 3.0F) 
       {
     	  
+    	 setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     	 this.mRenderer.cube.musStop();
          this.mRenderer.init(this.mp);
+         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
       }
 
    }
@@ -130,33 +132,35 @@ public class NewRender extends GLSurfaceView implements SensorEventListener
    // гироскоп
    public void onSensorChanged(SensorEvent var1) 
    {
-	  // наклоняем телефон на 30 градусов, ничего не изменяется! 
-	  if((double)var1.values[1] < 3.14/6.f || (double)var1.values[1] > 3.14 - 3.14/6.f)
-	  {
+	   if(this.mRenderer.flLoad){
+		   // наклоняем телефон на 30 градусов, ничего не изменяется! 
+		  if((double)var1.values[1] < 3.14/6.f || (double)var1.values[1] > 3.14 - 3.14/6.f)
+		  {
+			  
+		  }
 		  
-	  }
-	  
-	  // наклоняем на больше чем +-30 градусов, но меньше, чем на +-60
-	  if((double)var1.values[1] >= 3.14/6.f && (double)var1.values[1] < 3.14/3.f)
-	  {
-		  //this.mRenderer.dx_turn += 0.14;
-	  }
-	  
-	  if((double)var1.values[1] > 3.14 - 3.14/3.f && (double)var1.values[1] <= 3.14 - 3.14/6.f)
-	  {
-		  //this.mRenderer.dx_turn -= 0.164;
-	  }
-	  // наклоняем на больше чем +-60 градусов
-	  if((double)var1.values[1] > 3.14/3.f)
-	  {
-		  //this.mRenderer.dx_turn += 0.2;
-	  }
+		  // наклоняем на больше чем +-30 градусов, но меньше, чем на +-60
+		  if((double)var1.values[1] >= 7 && (double)var1.values[1] < 15.f)
+		  {
+			  this.mRenderer.dx_turn += 0.14;
+		  }
 		  
-	  if((double)var1.values[1] < 3.14 - 3.14/3.f)
-	  {
-		  //this.mRenderer.dx_turn -= 0.2;
-	  }
-      this.predFlf = var1.values[1];
+		  if((double)var1.values[1] > -15 && (double)var1.values[1] <= -7)
+		  {
+			  this.mRenderer.dx_turn -= 0.14;
+		  }
+		  // наклоняем на больше чем +-60 градусов
+		  if((double)var1.values[1] > 15)
+		  {
+			  this.mRenderer.dx_turn += 0.2;
+		  }
+			  
+		  if((double)var1.values[1] < -15)
+		  {
+			  this.mRenderer.dx_turn -= 0.2;
+		  }
+	      this.predFlf = var1.values[1];
+	   }
    }
 
    public boolean onTouchEvent(MotionEvent var1) 
@@ -204,6 +208,6 @@ public class NewRender extends GLSurfaceView implements SensorEventListener
    {
 	   this.mRenderer = new GLClass(this.get_Context, this.mp);
 	   this.setRenderer(this.mRenderer);
-	   this.m.registerListener(this, this.m.getDefaultSensor(3), 3);
+	   this.m.registerListener(this, this.m.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_FASTEST); 
    }
 }

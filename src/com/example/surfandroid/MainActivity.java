@@ -34,6 +34,10 @@ public class MainActivity extends Activity implements OnClickListener
         this.listTrack.setOnClickListener(this);
         
         this.textW = ((TextView)findViewById(R.id.Tex1));
+        //WorkFile genFile = new WorkFile();
+        //genFile.readFile();
+	   	//genFile.readWave();
+        //this.textW.setText(genFile.wav.get(0).toString());
     }
     
     protected void onStart() 
@@ -46,7 +50,7 @@ public class MainActivity extends Activity implements OnClickListener
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
     {
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 

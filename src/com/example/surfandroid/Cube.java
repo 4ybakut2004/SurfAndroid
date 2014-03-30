@@ -79,19 +79,18 @@ public class Cube
 	      for(int i = 0; i < genFile.wav.size(); i++)
 	      {
 	    	  heigthMap var2 = new heigthMap();
-		      var2.pos = (i + 1) * 100;
-		      var2.heigth = 25 * genFile.wav.get(i) / 32000.0f; 
-		      if(rnd.nextInt(2) == 1) var2.heigth = - var2.heigth;
-		      var2.a = 0.065F;
-	    	  if(rnd.nextInt(2) == 1)
-	    	  {
-	    		  this.HMap.add(var2);
-	    	  }
-	    	  else
-	    	  {
-	    		  this.RMap.add(var2);
-	    	  }
+		      var2.pos = (i + 1) * 30;
+		      var2.heigth = 5 * genFile.wav.get(i) / 40.0f; 
+		     
+		      var2.a = 0.2F;
+	    	  this.HMap.add(var2);
 	      }
+	      
+	      heigthMap varR = new heigthMap();
+		  varR.pos = 500;
+		  varR.heigth = 60.0f;
+		  varR.a = 0.01f;
+		  this.RMap.add(varR);
 	      int var14 = 0;
 
 	      int var29;
@@ -179,7 +178,7 @@ public class Cube
 	      {
 	         for(int var39 = 0; var39 < this.Size_y; var39++) 
 	         {
-	        	texture[var37++] = (float)var39 / ((float)this.Size_y / 128.0F);
+	        	texture[var37++] = (float)var39 / ((float)this.Size_y / (128 * this.Size_y / 1350.0f));
 	        	texture[var37++] = (float)var38 / (float)(this.Size_x - 1);
 	         }
 	      }
@@ -231,7 +230,7 @@ public class Cube
 	      {
 	         for(int var39 = 0; var39 < this.Size_y; var39++) 
 	         {
-	        	textureBorder[var37++] = (float)var39 / ((float)this.Size_y / 128.0F);
+	        	textureBorder[var37++] = (float)var39 / ((float)this.Size_y);
 	        	textureBorder[var37++] = (float)var38 / (float)(this.Size_x - 1);
 	         }
 	      }
