@@ -27,16 +27,12 @@ public class line_cool
    
    Vec3 disFromC = new Vec3();
    Vec3 xyz = new Vec3();
-   
-   boolean coolFl;
 
    public line_cool() 
    {
 	  xyz.x = 0.6F;
 	  xyz.y = 0.3F;
 	  xyz.z = 0.8F;
-	  
-	  coolFl = false;
 	  
       ByteBuffer var1 = ByteBuffer.allocateDirect(4 * this.vertices.length);
       var1.order(ByteOrder.nativeOrder());
@@ -72,6 +68,7 @@ public class line_cool
 	  var1.glDisable(GL10.GL_DEPTH_TEST);
 	  var1.glEnable(GL10.GL_BLEND);
 	  var1.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_DST_ALPHA);
+	  //GLES20.glBlendEquation( GLES20.GL_FUNC_SUBTRACT );
 	  
       var1.glFrontFace(GL10.GL_CW);
       
@@ -106,7 +103,6 @@ public class line_cool
          } else {
             this.vertices[3] = -0.9F;
             this.vertices[9] = -0.9F;
-            if(var1 > 0) coolFl = true;
          }
       } else {
          this.vertices = new float[]{-3.0F, -1.5F, 0.0F, 3.0F, -1.5F, 0.0F, -3.0F, 1.5F, 0.0F, 3.0F, 1.5F, 0.0F};

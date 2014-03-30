@@ -179,7 +179,7 @@ public class Cube
 	      {
 	         for(int var39 = 0; var39 < this.Size_y; var39++) 
 	         {
-	        	texture[var37++] = (float)var39 / ((float)this.Size_y / (128 * this.Size_y / 1350.0f));
+	        	texture[var37++] = (float)var39 / ((float)this.Size_y / 128.0F);
 	        	texture[var37++] = (float)var38 / (float)(this.Size_x - 1);
 	         }
 	      }
@@ -231,7 +231,7 @@ public class Cube
 	      {
 	         for(int var39 = 0; var39 < this.Size_y; var39++) 
 	         {
-	        	textureBorder[var37++] = (float)var39 / ((float)this.Size_y);
+	        	textureBorder[var37++] = (float)var39 / ((float)this.Size_y / 128.0F);
 	        	textureBorder[var37++] = (float)var38 / (float)(this.Size_x - 1);
 	         }
 	      }
